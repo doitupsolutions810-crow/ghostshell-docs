@@ -2,7 +2,7 @@
 # Simple integration test harness that hits the four endpoints.
 # Usage: Start the local server (`python3 extension/server.py`) then run this script.
 set -euo pipefail
-BASE=http://127.0.0.1:5000
+BASE=${BASE:-http://127.0.0.1:5000}
 ENDPOINTS=(attestation merkle drift compliance)
 
 for e in "${ENDPOINTS[@]}"; do

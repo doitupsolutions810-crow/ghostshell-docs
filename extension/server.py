@@ -71,4 +71,7 @@ def root():
 
 if __name__ == "__main__":
     # Bind to localhost only for safety.
-    app.run(host="127.0.0.1", port=5000)
+    # Honor PORT environment variable so tests can run on alternate ports if 5000 is in use.
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="127.0.0.1", port=port)
