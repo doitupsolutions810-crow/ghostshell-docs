@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1767873505468,
+      "tag": "0000_ambiguous_amazoness",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1767944544167,
+      "tag": "0001_charming_stellaris",
+      "breakpoints": true
+    }
+  ]
+}

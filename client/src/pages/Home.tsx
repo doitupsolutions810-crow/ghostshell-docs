@@ -1,11 +1,14 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, CheckCircle, Download, Terminal, Zap } from "lucide-react";
+import { AlertCircle, CheckCircle, Download, FileUp, Terminal, Zap } from "lucide-react";
 import { useState } from "react";
 import { Streamdown } from 'streamdown';
+import { getLoginUrl } from "@/const";
 
 export default function Home() {
+  const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
 
   const installationSteps = [
@@ -58,9 +61,9 @@ export default function Home() {
       description: "Attestation, Merkle Proof, Drift Detection, and Compliance"
     },
     {
-      icon: AlertCircle,
-      title: "Status Monitoring",
-      description: "Real-time status indicators for operation completion"
+      icon: FileUp,
+      title: "File Storage",
+      description: "Upload and manage security scripts with cloud storage"
     }
   ];
 
@@ -114,15 +117,30 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-accent glow-text">GhostShell Security</h1>
-              <p className="text-muted-foreground mt-1">Chrome Extension Documentation</p>
+              <p className="text-muted-foreground mt-1">Chrome Extension Documentation & File Management</p>
             </div>
-            <Button 
-              className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground"
-              onClick={() => window.location.href = '#download'}
-            >
-              <Download className="w-4 h-4" />
-              Download Extension
-            </Button>
+            <div className="flex gap-3">
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-muted-foreground">Welcome, {user?.name}</span>
+                  <Button 
+                    className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground"
+                    onClick={() => window.location.href = '/files'}
+                  >
+                    <FileUp className="w-4 h-4" />
+                    Manage Files
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground"
+                  onClick={() => window.location.href = getLoginUrl()}
+                >
+                  <Download className="w-4 h-4" />
+                  Sign In
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -278,19 +296,26 @@ export default function Home() {
 
               <Card className="border-border bg-card">
                 <CardHeader>
-                  <CardTitle>Status Bar Guide</CardTitle>
+                  <CardTitle>File Management</CardTitle>
+                  <CardDescription>Upload and organize your security scripts</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-background rounded-lg border border-border/50">
-                      <p className="text-xs text-muted-foreground mb-1">SEC_LEVEL</p>
-                      <p className="font-mono text-sm text-accent">ALPHA / BETA / PROD</p>
-                    </div>
-                    <div className="p-3 bg-background rounded-lg border border-border/50">
-                      <p className="text-xs text-muted-foreground mb-1">STATUS States</p>
-                      <p className="font-mono text-sm text-accent">IDLE / RUNNING / COMPLETED / ERROR</p>
-                    </div>
-                  </div>
+                <CardContent>
+                  {isAuthenticated ? (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Upload your security scripts to cloud storage for easy access and management. Your files are securely stored and can be downloaded at any time.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Sign in to enable file storage and management features.
+                    </p>
+                  )}
+                  <Button 
+                    className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                    onClick={() => window.location.href = isAuthenticated ? '/files' : getLoginUrl()}
+                  >
+                    <FileUp className="w-4 h-4 mr-2" />
+                    {isAuthenticated ? 'Go to File Manager' : 'Sign In to Upload Files'}
+                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -331,92 +356,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Advanced Configuration */}
-      <section className="border-t border-border py-12 bg-card/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Advanced Configuration</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle>Custom Script Paths</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">Modify server.py to use scripts from different locations:</p>
-                <div className="bg-background p-3 rounded-lg font-mono text-xs border border-border overflow-x-auto">
-                  <Streamdown>{`\`\`\`python
-SCRIPTS = {
-    'attestation': '/path/to/gen_attestations.sh',
-    'merkle': '/path/to/verify_merkle_proof.py',
-    'drift': '/path/to/drift_check.sh',
-    'compliance': '/path/to/gen_verification_report.sh'
-}
-\`\`\``}</Streamdown>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle>Change Server Port</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">Run the server on a different port:</p>
-                <div className="bg-background p-3 rounded-lg font-mono text-xs border border-border overflow-x-auto">
-                  <Streamdown>{`\`\`\`python
-if __name__ == '__main__':
-    app.run(port=8000)  # Change from 5000
-\`\`\``}</Streamdown>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Security Section */}
-      <section className="border-t border-border py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Security Considerations</h2>
-          <Card className="border-border bg-card">
-            <CardContent className="pt-6 space-y-4">
-              <div className="flex gap-4">
-                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold mb-1">Local Execution Only</h4>
-                  <p className="text-sm text-muted-foreground">The extension runs only on localhost:5000 and does not transmit data to external servers.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold mb-1">Protect Your Scripts</h4>
-                  <p className="text-sm text-muted-foreground">Keep scripts private, use restrictive file permissions (chmod 700), and monitor server logs.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle className="w-5 h-5 text-accent flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-semibold mb-1">Network Isolation</h4>
-                  <p className="text-sm text-muted-foreground">Never expose the backend server to the internet. Use a firewall to restrict localhost connections if needed.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="border-t border-border bg-card/50 py-8 mt-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">GhostShell Security Extension v1.0</p>
-              <p className="text-xs text-muted-foreground/70">Last Updated: January 2026</p>
+              <p className="text-sm text-muted-foreground">GhostShell Security Extension v2.0</p>
+              <p className="text-xs text-muted-foreground/70">Full-Stack with File Storage</p>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>Status: Stable Release</span>
+              <span>Status: Full-Stack Release</span>
               <span className="w-2 h-2 bg-accent rounded-full"></span>
-              <span>Local Only</span>
+              <span>Cloud Storage Ready</span>
             </div>
           </div>
         </div>
