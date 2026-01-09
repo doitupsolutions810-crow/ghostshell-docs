@@ -73,5 +73,11 @@ Purpose: give an AI coding agent everything immediately useful to be productive 
 - Do you want the Python `server.py` to be tracked in this repo or intentionally kept external? (Docs imply it can be generated; confirm preferred workflow.)
 - Are there canonical test fixtures for the extension scripts to enable automated tests for the Flask endpoints?
 
+## Build notes & local test server stub
+- Build warnings observed locally: `%VITE_ANALYTICS_ENDPOINT%` and `%VITE_ANALYTICS_WEBSITE_ID%` are referenced in `index.html`. If you use analytics, set these via environment or a `.env` in the repo root (Vite reads envs from `envDir`). If you do not use analytics, it's safe to leave them undefined during development.
+- Bundle size: Some chunks exceeded 500KB after minification during the production build. Recommended options: use dynamic `import()` to code-split large dependencies, or configure `build.rollupOptions.output.manualChunks` to split heavy libraries.
+- Local test server stub (optional): A minimal Flask server is included at `extension/server.py`. It implements the documented endpoints (`/attestation`, `/merkle`, `/drift`, `/compliance`), returns JSON `{"output":..., "status":"success|error"}`, and sets CORS headers. Placeholder scripts live in `extension/scripts/`. Run the server with `python3 extension/server.py` and test with `bash tests/integration.sh`.
+- Security note: The included test server binds to `127.0.0.1:5000`. It's intended for local development only — **do not** expose it to the internet.
+
 ---
 If you'd like, I can open a PR adding this file (or update an existing `.github/copilot-instructions.md` if you prefer a different tone or additional details). What should I add or emphasize next?
